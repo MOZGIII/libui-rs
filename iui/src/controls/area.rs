@@ -5,8 +5,8 @@ use draw;
 use std::mem;
 use std::os::raw::c_int;
 use ui::UI;
-pub use ui_sys::uiExtKey as ExtKey;
-use ui_sys::{
+pub use libui_sys::uiExtKey as ExtKey;
+use libui_sys::{
     self, uiArea, uiAreaDrawParams, uiAreaHandler, uiAreaKeyEvent, uiAreaMouseEvent, uiControl,
 };
 
@@ -151,7 +151,7 @@ impl Area {
     pub fn new(ctx: &UI, area_handler: Box<AreaHandler>) -> Area {
         unsafe {
             let mut rust_area_handler = RustAreaHandler::new(ctx, area_handler);
-            let area = Area::from_raw(ui_sys::uiNewArea(
+            let area = Area::from_raw(libui_sys::uiNewArea(
                 &mut *rust_area_handler as *mut RustAreaHandler as *mut uiAreaHandler,
             ));
             mem::forget(rust_area_handler);
@@ -168,7 +168,7 @@ impl Area {
     ) -> Area {
         unsafe {
             let mut rust_area_handler = RustAreaHandler::new(ctx, area_handler);
-            let area = Area::from_raw(ui_sys::uiNewScrollingArea(
+            let area = Area::from_raw(libui_sys::uiNewScrollingArea(
                 &mut *rust_area_handler as *mut RustAreaHandler as *mut uiAreaHandler,
                 width as i32,
                 height as i32,
@@ -188,13 +188,13 @@ impl Area {
     /// If called on a non-scrolling `Area`, this function's behavior is undefined.
     pub unsafe fn set_size(&self, _ctx: &UI, width: u64, height: u64) {
         // TODO: Check if the area is scrolling?
-        ui_sys::uiAreaSetSize(self.uiArea, width as i32, height as i32);
+        libui_sys::uiAreaSetSize(self.uiArea, width as i32, height as i32);
     }
 
     /// Queues the entire `Area` to be redrawn. This function returns immediately;
     /// the `Area` is redrawn when the UI thread is next non-busy.
     pub fn queue_redraw_all(&self, _ctx: &UI) {
-        unsafe { ui_sys::uiAreaQueueRedrawAll(self.uiArea) }
+        unsafe { libui_sys::uiAreaQueueRedrawAll(self.uiArea) }
     }
 
     /// Scrolls the Area to show the given rectangle. This behavior is somewhat
@@ -205,7 +205,7 @@ impl Area {
     /// If called on a non-scrolling `Area`, this function's behavior is undefined.
     pub unsafe fn scroll_to(&self, _ctx: &UI, x: f64, y: f64, width: f64, height: f64) {
         // TODO: Make some way to check whether the given area is scrolling or not.
-        ui_sys::uiAreaScrollTo(self.uiArea, x, y, width, height);
+        libui_sys::uiAreaScrollTo(self.uiArea, x, y, width, height);
     }
 }
 

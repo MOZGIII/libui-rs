@@ -46,25 +46,25 @@ macro_rules! define_control {
             // Show this control to the user. This will also show its non-hidden children.
             pub fn show(&mut self, _ctx: &UI) {
                 let control: Control = self.clone().into();
-                unsafe { ui_sys::uiControlShow(control.ui_control) }
+                unsafe { libui_sys::uiControlShow(control.ui_control) }
             }
 
             // Hide this control from the user. This will hide its children.
             pub fn hide(&mut self, _ctx: &UI) {
                 let control: Control = self.clone().into();
-                unsafe { ui_sys::uiControlHide(control.ui_control) }
+                unsafe { libui_sys::uiControlHide(control.ui_control) }
             }
 
             // Enable this control.
             pub fn enable(&mut self, _ctx: &UI) {
                 let control: Control = self.clone().into();
-                unsafe { ui_sys::uiControlEnable(control.ui_control) }
+                unsafe { libui_sys::uiControlEnable(control.ui_control) }
             }
 
             // Disable this control.
             pub fn disable(&mut self, _ctx: &UI) {
                 let control: Control = self.clone().into();
-                unsafe { ui_sys::uiControlDisable(control.ui_control) }
+                unsafe { libui_sys::uiControlDisable(control.ui_control) }
             }
 
             /// Create an `iui` struct for this control from the raw pointer for it.

@@ -3,7 +3,7 @@
 //! Note that `Control` and all specific control types are references to memory which is owned by the UI library.
 
 use ui::UI;
-use ui_sys::{self, uiControl};
+use libui_sys::{self, uiControl};
 
 use std::ptr;
 
@@ -62,7 +62,7 @@ impl Control {
     /// is marked unsafe.
     pub unsafe fn destroy(&self) {
         // Don't check for initialization here since this can be run during deinitialization.
-        ui_sys::uiControlDestroy(self.ui_control)
+        libui_sys::uiControlDestroy(self.ui_control)
     }
 }
 
@@ -70,7 +70,7 @@ impl UI {
     // Return the parent control of the given control, or None if the control is orphaned.
     pub fn parent_of<T: Into<Control>>(&self, control: T) -> Option<Control> {
         unsafe {
-            let ptr = ui_sys::uiControlParent(control.into().ui_control);
+            let ptr = libui_sys::uiControlParent(control.into().ui_control);
             if ptr.is_null() {
                 None
             } else {
@@ -83,7 +83,7 @@ impl UI {
     /// the UI tree or, if passed `None`, removing it from the tree.
     // TODO: Does this actually need to be unsafe? I don't really see why it is.
     pub unsafe fn set_parent_of<T: Into<Control>>(&mut self, control: T, parent: Option<T>) {
-        ui_sys::uiControlSetParent(
+        libui_sys::uiControlSetParent(
             control.into().ui_control,
             match parent {
                 None => ptr::null_mut(),
@@ -95,26 +95,26 @@ impl UI {
     /// Returns true if this control is a top-level control; the root of
     /// the UI tree.
     pub fn is_toplevel<T: Into<Control>>(&self, control: T) -> bool {
-        unsafe { ui_sys::uiControlToplevel(control.into().ui_control) != 0 }
+        unsafe { libui_sys::uiControlToplevel(control.into().ui_control) != 0 }
     }
 
     /// Returns true if this control is currently set to be displayed.
     pub fn is_shown<T: Into<Control>>(&self, control: T) -> bool {
-        unsafe { ui_sys::uiControlVisible(control.into().ui_control) != 0 }
+        unsafe { libui_sys::uiControlVisible(control.into().ui_control) != 0 }
     }
 
     /// Sets whether or not the control should be displayed.
     pub fn set_shown<T: Into<Control>>(&mut self, control: T, show: bool) {
         if show {
-            unsafe { ui_sys::uiControlShow(control.into().ui_control) }
+            unsafe { libui_sys::uiControlShow(control.into().ui_control) }
         } else {
-            unsafe { ui_sys::uiControlHide(control.into().ui_control) }
+            unsafe { libui_sys::uiControlHide(control.into().ui_control) }
         }
     }
 
     /// Returns true if the control is enabled (can be interacted with).
     pub fn is_enabled<T: Into<Control>>(&self, control: T) -> bool {
-        unsafe { ui_sys::uiControlEnabled(control.into().ui_control) != 0 }
+        unsafe { libui_sys::uiControlEnabled(control.into().ui_control) != 0 }
     }
 
     /// Sets the enable/disable state of the control. If disabled, a control
@@ -122,9 +122,9 @@ impl UI {
     /// to the user.
     pub fn set_enabled<T: Into<Control>>(&mut self, control: T, enabled: bool) {
         if enabled {
-            unsafe { ui_sys::uiControlEnable(control.into().ui_control) }
+            unsafe { libui_sys::uiControlEnable(control.into().ui_control) }
         } else {
-            unsafe { ui_sys::uiControlDisable(control.into().ui_control) }
+            unsafe { libui_sys::uiControlDisable(control.into().ui_control) }
         }
     }
 }

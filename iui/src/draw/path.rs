@@ -1,6 +1,6 @@
 use draw::DrawContext;
 use std::os::raw::c_int;
-use ui_sys::{self, uiDrawFillMode, uiDrawFillModeAlternate, uiDrawFillModeWinding, uiDrawPath};
+use libui_sys::{self, uiDrawFillMode, uiDrawFillModeAlternate, uiDrawFillModeWinding, uiDrawPath};
 
 pub struct Path {
     ui_draw_path: *mut uiDrawPath,
@@ -8,7 +8,7 @@ pub struct Path {
 
 impl Drop for Path {
     fn drop(&mut self) {
-        unsafe { ui_sys::uiDrawFreePath(self.ui_draw_path) }
+        unsafe { libui_sys::uiDrawFreePath(self.ui_draw_path) }
     }
 }
 
@@ -34,13 +34,13 @@ impl Path {
     pub fn new(_ctx: &DrawContext, fill_mode: FillMode) -> Path {
         unsafe {
             Path {
-                ui_draw_path: ui_sys::uiDrawNewPath(fill_mode.into_ui_fillmode()),
+                ui_draw_path: libui_sys::uiDrawNewPath(fill_mode.into_ui_fillmode()),
             }
         }
     }
 
     pub fn new_figure(&self, _ctx: &DrawContext, x: f64, y: f64) {
-        unsafe { ui_sys::uiDrawPathNewFigure(self.ui_draw_path, x, y) }
+        unsafe { libui_sys::uiDrawPathNewFigure(self.ui_draw_path, x, y) }
     }
 
     pub fn new_figure_with_arc(
@@ -54,7 +54,7 @@ impl Path {
         negative: bool,
     ) {
         unsafe {
-            ui_sys::uiDrawPathNewFigureWithArc(
+            libui_sys::uiDrawPathNewFigureWithArc(
                 self.ui_draw_path,
                 x_center,
                 y_center,
@@ -67,7 +67,7 @@ impl Path {
     }
 
     pub fn line_to(&self, _ctx: &DrawContext, x: f64, y: f64) {
-        unsafe { ui_sys::uiDrawPathLineTo(self.ui_draw_path, x, y) }
+        unsafe { libui_sys::uiDrawPathLineTo(self.ui_draw_path, x, y) }
     }
 
     pub fn arc_to(
@@ -81,7 +81,7 @@ impl Path {
         negative: bool,
     ) {
         unsafe {
-            ui_sys::uiDrawPathArcTo(
+            libui_sys::uiDrawPathArcTo(
                 self.ui_draw_path,
                 x_center,
                 y_center,
@@ -103,19 +103,19 @@ impl Path {
         end_x: f64,
         end_y: f64,
     ) {
-        unsafe { ui_sys::uiDrawPathBezierTo(self.ui_draw_path, c1x, c1y, c2x, c2y, end_x, end_y) }
+        unsafe { libui_sys::uiDrawPathBezierTo(self.ui_draw_path, c1x, c1y, c2x, c2y, end_x, end_y) }
     }
 
     pub fn close_figure(&self, _ctx: &DrawContext) {
-        unsafe { ui_sys::uiDrawPathCloseFigure(self.ui_draw_path) }
+        unsafe { libui_sys::uiDrawPathCloseFigure(self.ui_draw_path) }
     }
 
     pub fn add_rectangle(&self, _ctx: &DrawContext, x: f64, y: f64, width: f64, height: f64) {
-        unsafe { ui_sys::uiDrawPathAddRectangle(self.ui_draw_path, x, y, width, height) }
+        unsafe { libui_sys::uiDrawPathAddRectangle(self.ui_draw_path, x, y, width, height) }
     }
 
     pub fn end(&self, _ctx: &DrawContext) {
-        unsafe { ui_sys::uiDrawPathEnd(self.ui_draw_path) }
+        unsafe { libui_sys::uiDrawPathEnd(self.ui_draw_path) }
     }
 
     /// Return the underlying pointer for this Path.

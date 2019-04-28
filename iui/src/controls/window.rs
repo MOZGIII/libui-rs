@@ -7,7 +7,7 @@ use std::ffi::{CStr, CString};
 use std::mem;
 use std::path::PathBuf;
 use ui::UI;
-use ui_sys::{self, uiControl, uiWindow};
+use libui_sys::{self, uiControl, uiWindow};
 
 thread_local! {
     static WINDOWS: RefCell<Vec<Window>> = RefCell::new(Vec::new())
@@ -37,7 +37,7 @@ impl Window {
         };
         let mut window = unsafe {
             let c_string = CString::new(title.as_bytes().to_vec()).unwrap();
-            let window = Window::from_raw(ui_sys::uiNewWindow(
+            let window = Window::from_raw(libui_sys::uiNewWindow(
                 c_string.as_ptr(),
                 width,
                 height,
@@ -64,7 +64,7 @@ impl Window {
     /// Get the current title of the window.
     pub fn title(&self, _ctx: &UI) -> String {
         unsafe {
-            CStr::from_ptr(ui_sys::uiWindowTitle(self.uiWindow))
+            CStr::from_ptr(libui_sys::uiWindowTitle(self.uiWindow))
                 .to_string_lossy()
                 .into_owned()
         }
@@ -72,14 +72,14 @@ impl Window {
 
     /// Get a reference to the current title of the window.
     pub fn title_ref(&self, _ctx: &UI) -> &CStr {
-        unsafe { &CStr::from_ptr(ui_sys::uiWindowTitle(self.uiWindow)) }
+        unsafe { &CStr::from_ptr(libui_sys::uiWindowTitle(self.uiWindow)) }
     }
 
     /// Set the window's title to the given string.
     pub fn set_title(&mut self, _ctx: &UI, title: &str) {
         unsafe {
             let c_string = CString::new(title.as_bytes().to_vec()).unwrap();
-            ui_sys::uiWindowSetTitle(self.uiWindow, c_string.as_ptr())
+            libui_sys::uiWindowSetTitle(self.uiWindow, c_string.as_ptr())
         }
     }
 
@@ -93,7 +93,7 @@ impl Window {
                 callback(window);
                 false
             }));
-            ui_sys::uiWindowOnClosing(
+            libui_sys::uiWindowOnClosing(
                 self.uiWindow,
                 Some(c_callback),
                 &mut *data as *mut Box<FnMut(&mut Window) -> bool> as *mut c_void,
@@ -113,22 +113,22 @@ impl Window {
 
     /// Check whether or not this window has margins around the edges.
     pub fn margined(&self, _ctx: &UI) -> bool {
-        unsafe { ui_sys::uiWindowMargined(self.uiWindow) != 0 }
+        unsafe { libui_sys::uiWindowMargined(self.uiWindow) != 0 }
     }
 
     /// Set whether or not the window has margins around the edges.
     pub fn set_margined(&mut self, _ctx: &UI, margined: bool) {
-        unsafe { ui_sys::uiWindowSetMargined(self.uiWindow, margined as c_int) }
+        unsafe { libui_sys::uiWindowSetMargined(self.uiWindow, margined as c_int) }
     }
 
     /// Sets the window's child widget. The window can only have one child widget at a time.
     pub fn set_child<T: Into<Control>>(&mut self, _ctx: &UI, child: T) {
-        unsafe { ui_sys::uiWindowSetChild(self.uiWindow, child.into().as_ui_control()) }
+        unsafe { libui_sys::uiWindowSetChild(self.uiWindow, child.into().as_ui_control()) }
     }
 
     /// Allow the user to select an existing file.
     pub fn open_file(&self, _ctx: &UI) -> Option<PathBuf> {
-        let ptr = unsafe { ui_sys::uiOpenFile(self.uiWindow) };
+        let ptr = unsafe { libui_sys::uiOpenFile(self.uiWindow) };
         if ptr.is_null() {
             return None;
         };
@@ -138,7 +138,7 @@ impl Window {
 
     /// Allow the user to select a new or existing file.
     pub fn save_file(&self, _ctx: &UI) -> Option<PathBuf> {
-        let ptr = unsafe { ui_sys::uiSaveFile(self.uiWindow) };
+        let ptr = unsafe { libui_sys::uiSaveFile(self.uiWindow) };
         if ptr.is_null() {
             return None;
         };
@@ -152,7 +152,7 @@ impl Window {
         unsafe {
             let c_title = CString::new(title.as_bytes().to_vec()).unwrap();
             let c_description = CString::new(description.as_bytes().to_vec()).unwrap();
-            ui_sys::uiMsgBox(self.uiWindow, c_title.as_ptr(), c_description.as_ptr())
+            libui_sys::uiMsgBox(self.uiWindow, c_title.as_ptr(), c_description.as_ptr())
         }
     }
 
@@ -162,7 +162,7 @@ impl Window {
         unsafe {
             let c_title = CString::new(title.as_bytes().to_vec()).unwrap();
             let c_description = CString::new(description.as_bytes().to_vec()).unwrap();
-            ui_sys::uiMsgBoxError(self.uiWindow, c_title.as_ptr(), c_description.as_ptr())
+            libui_sys::uiMsgBoxError(self.uiWindow, c_title.as_ptr(), c_description.as_ptr())
         }
     }
 
@@ -179,6 +179,6 @@ impl Window {
     /// is marked unsafe.
     pub unsafe fn destroy(&self) {
         // Don't check for initialization here since this can be run during deinitialization.
-        ui_sys::uiControlDestroy(self.uiWindow as *mut ui_sys::uiControl)
+        libui_sys::uiControlDestroy(self.uiWindow as *mut libui_sys::uiControl)
     }
 }

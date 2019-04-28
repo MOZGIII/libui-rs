@@ -12,7 +12,7 @@ pub use self::path::*;
 pub use self::strokeparams::*;
 pub use self::transform::*;
 
-pub use ui_sys::uiDrawDefaultMiterLimit as DEFAULT_MITER_LIMIT;
+pub use libui_sys::uiDrawDefaultMiterLimit as DEFAULT_MITER_LIMIT;
 
 // pub struct FontFamilies {
 //     ui_draw_font_families: *mut uiDrawFontFamilies,
@@ -20,7 +20,7 @@ pub use ui_sys::uiDrawDefaultMiterLimit as DEFAULT_MITER_LIMIT;
 
 // impl Drop for FontFamilies {
 //     fn drop(&mut self) {
-//         unsafe { ui_sys::uiDrawFreeFontFamilies(self.ui_draw_font_families) }
+//         unsafe { libui_sys::uiDrawFreeFontFamilies(self.ui_draw_font_families) }
 //     }
 // }
 
@@ -28,19 +28,19 @@ pub use ui_sys::uiDrawDefaultMiterLimit as DEFAULT_MITER_LIMIT;
 //     pub fn list(_ctx: &UI) ->  FontFamilies {
 //         unsafe {
 //             FontFamilies {
-//                 ui_draw_font_families: ui_sys::uiDrawListFontFamilies(),
+//                 ui_draw_font_families: libui_sys::uiDrawListFontFamilies(),
 //             }
 //         }
 //     }
 
 //     pub fn len(&self, _ctx: &UI) -> u64 {
-//         unsafe { ui_sys::uiDrawFontFamiliesNumFamilies(self.ui_draw_font_families) }
+//         unsafe { libui_sys::uiDrawFontFamiliesNumFamilies(self.ui_draw_font_families) }
 //     }
 
 //     pub fn family(&self, ctx: &UI, index: u64) -> Text {
 //         assert!(index < self.len(ctx));
 //         unsafe {
-//             Text::new(ui_sys::uiDrawFontFamiliesFamily(
+//             Text::new(libui_sys::uiDrawFontFamiliesFamily(
 //                 self.ui_draw_font_families,
 //                 index,
 //             ))
@@ -54,12 +54,12 @@ pub use ui_sys::uiDrawDefaultMiterLimit as DEFAULT_MITER_LIMIT;
 //     use std::os::raw::c_char;
 //     use std::ffi::{CStr, CString};
 //     use std::mem;
-//     use ui_sys::{self, uiDrawTextFont, uiDrawTextFontDescriptor, uiDrawTextLayout};
+//     use libui_sys::{self, uiDrawTextFont, uiDrawTextFontDescriptor, uiDrawTextLayout};
 
-//     pub use ui_sys::uiDrawTextWeight as Weight;
-//     pub use ui_sys::uiDrawTextItalic as Italic;
-//     pub use ui_sys::uiDrawTextStretch as Stretch;
-//     pub use ui_sys::uiDrawTextFontMetrics as FontMetrics;
+//     pub use libui_sys::uiDrawTextWeight as Weight;
+//     pub use libui_sys::uiDrawTextItalic as Italic;
+//     pub use libui_sys::uiDrawTextStretch as Stretch;
+//     pub use libui_sys::uiDrawTextFontMetrics as FontMetrics;
 
 //     pub struct FontDescriptor {
 //         family: CString,
@@ -100,7 +100,7 @@ pub use ui_sys::uiDrawDefaultMiterLimit as DEFAULT_MITER_LIMIT;
 //                     Stretch: self.stretch,
 //                 };
 //                 Font {
-//                     ui_draw_text_font: ui_sys::uiDrawLoadClosestFont(&font_descriptor),
+//                     ui_draw_text_font: libui_sys::uiDrawLoadClosestFont(&font_descriptor),
 //                 }
 //             }
 //         }
@@ -117,7 +117,7 @@ pub use ui_sys::uiDrawDefaultMiterLimit as DEFAULT_MITER_LIMIT;
 //     impl Drop for Font {
 
 //         fn drop(&mut self) {
-//             unsafe { ui_sys::uiDrawFreeTextFont(self.ui_draw_text_font) }
+//             unsafe { libui_sys::uiDrawFreeTextFont(self.ui_draw_text_font) }
 //         }
 //     }
 
@@ -130,13 +130,13 @@ pub use ui_sys::uiDrawDefaultMiterLimit as DEFAULT_MITER_LIMIT;
 //         }
 
 //         pub fn handle(&self, _ctx: &UI) -> usize {
-//             unsafe { ui_sys::uiDrawTextFontHandle(self.ui_draw_text_font) }
+//             unsafe { libui_sys::uiDrawTextFontHandle(self.ui_draw_text_font) }
 //         }
 
 //         pub fn describe(&self, _ctx: &UI) -> FontDescriptor {
 //             unsafe {
 //                 let mut ui_draw_text_font_descriptor = mem::uninitialized();
-//                 ui_sys::uiDrawTextFontDescribe(
+//                 libui_sys::uiDrawTextFontDescribe(
 //                     self.ui_draw_text_font,
 //                     &mut ui_draw_text_font_descriptor,
 //                 );
@@ -150,7 +150,7 @@ pub use ui_sys::uiDrawDefaultMiterLimit as DEFAULT_MITER_LIMIT;
 //                     italic: ui_draw_text_font_descriptor.Italic,
 //                     stretch: ui_draw_text_font_descriptor.Stretch,
 //                 };
-//                 ui_sys::uiFreeText(ui_draw_text_font_descriptor.Family as *mut c_char);
+//                 libui_sys::uiFreeText(ui_draw_text_font_descriptor.Family as *mut c_char);
 //                 font_descriptor
 //             }
 //         }
@@ -158,7 +158,7 @@ pub use ui_sys::uiDrawDefaultMiterLimit as DEFAULT_MITER_LIMIT;
 //         pub fn metrics(&self, _ctx: &UI) -> FontMetrics {
 //             unsafe {
 //                 let mut metrics = mem::uninitialized();
-//                 ui_sys::uiDrawTextFontGetMetrics(self.ui_draw_text_font, &mut metrics);
+//                 libui_sys::uiDrawTextFontGetMetrics(self.ui_draw_text_font, &mut metrics);
 //                 metrics
 //             }
 //         }
@@ -171,7 +171,7 @@ pub use ui_sys::uiDrawDefaultMiterLimit as DEFAULT_MITER_LIMIT;
 //     impl Drop for Layout {
 
 //         fn drop(&mut self) {
-//             unsafe { ui_sys::uiDrawFreeTextLayout(self.ui_draw_text_layout) }
+//             unsafe { libui_sys::uiDrawFreeTextLayout(self.ui_draw_text_layout) }
 //         }
 //     }
 
@@ -181,7 +181,7 @@ pub use ui_sys::uiDrawDefaultMiterLimit as DEFAULT_MITER_LIMIT;
 //             unsafe {
 //                 let c_string = CString::new(text.as_bytes().to_vec()).unwrap();
 //                 Layout {
-//                     ui_draw_text_layout: ui_sys::uiDrawNewTextLayout(
+//                     ui_draw_text_layout: libui_sys::uiDrawNewTextLayout(
 //                         c_string.as_ptr(),
 //                         default_font.ui_draw_text_font,
 //                         width,
@@ -195,13 +195,13 @@ pub use ui_sys::uiDrawDefaultMiterLimit as DEFAULT_MITER_LIMIT;
 //         }
 
 //         pub fn set_width(&self, _ctx: &UI, width: f64) {
-//             unsafe { ui_sys::uiDrawTextLayoutSetWidth(self.ui_draw_text_layout, width) }
+//             unsafe { libui_sys::uiDrawTextLayoutSetWidth(self.ui_draw_text_layout, width) }
 //         }
 
 //         pub fn extents(&self, _ctx: &UI) -> (f64, f64) {
 //             unsafe {
 //                 let mut extents = (0.0, 0.0);
-//                 ui_sys::uiDrawTextLayoutExtents(
+//                 libui_sys::uiDrawTextLayoutExtents(
 //                     self.ui_draw_text_layout,
 //                     &mut extents.0,
 //                     &mut extents.1,
@@ -212,7 +212,7 @@ pub use ui_sys::uiDrawDefaultMiterLimit as DEFAULT_MITER_LIMIT;
 
 //         pub fn set_color(&self, _ctx: &UI, start_char: i64, end_char: i64, r: f64, g: f64, b: f64, a: f64) {
 //             unsafe {
-//                 ui_sys::uiDrawTextLayoutSetColor(
+//                 libui_sys::uiDrawTextLayoutSetColor(
 //                     self.ui_draw_text_layout,
 //                     start_char,
 //                     end_char,

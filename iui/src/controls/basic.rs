@@ -3,7 +3,7 @@ use std::os::raw::c_void;
 use std::ffi::{CStr, CString};
 use std::mem;
 use ui::UI;
-use ui_sys::{self, uiButton, uiControl, uiLabel};
+use libui_sys::{self, uiButton, uiControl, uiLabel};
 
 define_control!{
     /// A non-interactable piece of text.
@@ -22,14 +22,14 @@ impl Button {
     pub fn new(_ctx: &UI, text: &str) -> Button {
         unsafe {
             let c_string = CString::new(text.as_bytes().to_vec()).unwrap();
-            Button::from_raw(ui_sys::uiNewButton(c_string.as_ptr()))
+            Button::from_raw(libui_sys::uiNewButton(c_string.as_ptr()))
         }
     }
 
     /// Get a copy of the existing text on the button.
     pub fn text(&self, _ctx: &UI) -> String {
         unsafe {
-            CStr::from_ptr(ui_sys::uiButtonText(self.uiButton))
+            CStr::from_ptr(libui_sys::uiButtonText(self.uiButton))
                 .to_string_lossy()
                 .into_owned()
         }
@@ -37,14 +37,14 @@ impl Button {
 
     /// Get a reference to the existing text on the button.
     pub fn text_ref(&self, _ctx: &UI) -> &CStr {
-        unsafe { CStr::from_ptr(ui_sys::uiButtonText(self.uiButton)) }
+        unsafe { CStr::from_ptr(libui_sys::uiButtonText(self.uiButton)) }
     }
 
     /// Set the text on the button.
     pub fn set_text(&mut self, _ctx: &UI, text: &str) {
         unsafe {
             let c_string = CString::new(text.as_bytes().to_vec()).unwrap();
-            ui_sys::uiButtonSetText(self.uiButton, c_string.as_ptr())
+            libui_sys::uiButtonSetText(self.uiButton, c_string.as_ptr())
         }
     }
 
@@ -52,7 +52,7 @@ impl Button {
     pub fn on_clicked<'ctx, F: FnMut(&mut Button) + 'ctx>(&mut self, _ctx: &'ctx UI, callback: F) {
         unsafe {
             let mut data: Box<Box<FnMut(&mut Button)>> = Box::new(Box::new(callback));
-            ui_sys::uiButtonOnClicked(
+            libui_sys::uiButtonOnClicked(
                 self.uiButton,
                 Some(c_callback),
                 &mut *data as *mut Box<FnMut(&mut Button)> as *mut c_void,
@@ -76,14 +76,14 @@ impl Label {
     pub fn new(_ctx: &UI, text: &str) -> Label {
         unsafe {
             let c_string = CString::new(text.as_bytes().to_vec()).unwrap();
-            Label::from_raw(ui_sys::uiNewLabel(c_string.as_ptr()))
+            Label::from_raw(libui_sys::uiNewLabel(c_string.as_ptr()))
         }
     }
 
     /// Get a copy of the existing text on the label.
     pub fn text(&self, _ctx: &UI) -> String {
         unsafe {
-            CStr::from_ptr(ui_sys::uiLabelText(self.uiLabel))
+            CStr::from_ptr(libui_sys::uiLabelText(self.uiLabel))
                 .to_string_lossy()
                 .into_owned()
         }
@@ -91,14 +91,14 @@ impl Label {
 
     /// Get a reference to the existing text on the label.
     pub fn text_ref(&self, _ctx: &UI) -> &CStr {
-        unsafe { CStr::from_ptr(ui_sys::uiLabelText(self.uiLabel)) }
+        unsafe { CStr::from_ptr(libui_sys::uiLabelText(self.uiLabel)) }
     }
 
     /// Set the text on the label.
     pub fn set_text(&mut self, _ctx: &UI, text: &str) {
         unsafe {
             let c_string = CString::new(text.as_bytes().to_vec()).unwrap();
-            ui_sys::uiLabelSetText(self.uiLabel, c_string.as_ptr())
+            libui_sys::uiLabelSetText(self.uiLabel, c_string.as_ptr())
         }
     }
 }

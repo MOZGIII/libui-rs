@@ -1,9 +1,9 @@
 use std::marker::PhantomData;
 use std::ptr;
 use draw::DrawContext;
-use ui_sys::{self, uiDrawBrush};
+use libui_sys::{self, uiDrawBrush};
 
-pub use ui_sys::uiDrawBrushGradientStop as BrushGradientStop;
+pub use libui_sys::uiDrawBrushGradientStop as BrushGradientStop;
 
 /// Used to determine how a given stroke or fill is drawn.
 #[derive(Clone, Debug)]
@@ -26,7 +26,7 @@ impl Brush {
         match *self {
             Brush::Solid(ref solid_brush) => BrushRef {
                 ui_draw_brush: uiDrawBrush {
-                    Type: ui_sys::uiDrawBrushTypeSolid as u32,
+                    Type: libui_sys::uiDrawBrushTypeSolid as u32,
 
                     R: solid_brush.r,
                     G: solid_brush.g,
@@ -45,7 +45,7 @@ impl Brush {
             },
             Brush::LinearGradient(ref linear_gradient_brush) => BrushRef {
                 ui_draw_brush: uiDrawBrush {
-                    Type: ui_sys::uiDrawBrushTypeLinearGradient as u32,
+                    Type: libui_sys::uiDrawBrushTypeLinearGradient as u32,
 
                     R: 0.0,
                     G: 0.0,
@@ -64,7 +64,7 @@ impl Brush {
             },
             Brush::RadialGradient(ref radial_gradient_brush) => BrushRef {
                 ui_draw_brush: uiDrawBrush {
-                    Type: ui_sys::uiDrawBrushTypeRadialGradient as u32,
+                    Type: libui_sys::uiDrawBrushTypeRadialGradient as u32,
 
                     R: 0.0,
                     G: 0.0,
@@ -85,7 +85,7 @@ impl Brush {
                 // These don't work yet in `libui`, but just for completeness' sake…
                 BrushRef {
                     ui_draw_brush: uiDrawBrush {
-                        Type: ui_sys::uiDrawBrushTypeImage as u32,
+                        Type: libui_sys::uiDrawBrushTypeImage as u32,
 
                         R: 0.0,
                         G: 0.0,

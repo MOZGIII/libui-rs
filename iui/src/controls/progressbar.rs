@@ -1,7 +1,7 @@
 use super::Control;
 use std::mem;
 use ui::UI;
-use ui_sys::{self, uiControl, uiProgressBar};
+use libui_sys::{self, uiControl, uiProgressBar};
 
 /// An enum representing the value of a `ProgressBar`.
 /// 
@@ -79,7 +79,7 @@ define_control! {
 impl ProgressBar {
     /// Create a new progress bar with a value of 0
     pub fn new() -> ProgressBar {
-        unsafe { ProgressBar::from_raw(ui_sys::uiNewProgressBar()) }
+        unsafe { ProgressBar::from_raw(libui_sys::uiNewProgressBar()) }
     }
 
     /// Create a new indeterminate progress bar
@@ -99,12 +99,12 @@ impl ProgressBar {
             }
             ProgressBarValue::Indeterminate => -1,
         };
-        unsafe { ui_sys::uiProgressBarSetValue(self.uiProgressBar, sys_value) }
+        unsafe { libui_sys::uiProgressBarSetValue(self.uiProgressBar, sys_value) }
     }
 
     /// Get the value of the progress bar
     pub fn value(&self, _ctx: &UI) -> ProgressBarValue {
-        let sys_value = unsafe { ui_sys::uiProgressBarValue(self.uiProgressBar) };
+        let sys_value = unsafe { libui_sys::uiProgressBarValue(self.uiProgressBar) };
         if sys_value.is_negative() {
             assert!(
                 sys_value == -1,

@@ -1,10 +1,10 @@
 use std::marker::PhantomData;
 use std::os::raw::c_double;
 use draw::DrawContext;
-use ui_sys::uiDrawStrokeParams;
+use libui_sys::uiDrawStrokeParams;
 
-pub use ui_sys::uiDrawLineCap as LineCap;
-pub use ui_sys::uiDrawLineJoin as LineJoin;
+pub use libui_sys::uiDrawLineCap as LineCap;
+pub use libui_sys::uiDrawLineJoin as LineJoin;
 
 #[derive(Clone, Debug)]
 pub struct StrokeParams {

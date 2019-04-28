@@ -1,7 +1,7 @@
 use error::UIError;
 use ffi_tools;
 use std::os::raw::{c_int, c_void};
-use ui_sys;
+use libui_sys as libui_sys;
 
 use std::ffi::CStr;
 use std::marker::PhantomData;
@@ -26,7 +26,7 @@ impl Drop for UIToken {
         );
         unsafe {
             Window::destroy_all_windows();
-            ui_sys::uiUninit();
+            libui_sys::uiUninit();
             ffi_tools::unset_initialized();
         }
     }
@@ -72,12 +72,12 @@ impl UI {
 
         unsafe {
             // Create the magic value needed to init libUI
-            let mut init_options = ui_sys::uiInitOptions {
-                Size: mem::size_of::<ui_sys::uiInitOptions>(),
+            let mut init_options = libui_sys::uiInitOptions {
+                Size: mem::size_of::<libui_sys::uiInitOptions>(),
             };
 
             // Actually start up the library's functionality
-            let err = ui_sys::uiInit(&mut init_options);
+            let err = libui_sys::uiInit(&mut init_options);
             if err.is_null() {
                 // Success! We can safely give the user a token allowing them to do UI things.
                 ffi_tools::set_initialized();
@@ -87,7 +87,7 @@ impl UI {
             } else {
                 // Error occurred; copy the string describing it, then free that memory.
                 let error_string = CStr::from_ptr(err).to_string_lossy().into_owned();
-                ui_sys::uiFreeInitError(err);
+                libui_sys::uiFreeInitError(err);
                 Err(UIError::FailedInitError {
                     error: error_string,
                 })
@@ -105,7 +105,7 @@ impl UI {
 
     /// Returns an `EventLoop`, a struct that allows you to step over iterations or events in the UI.
     pub fn event_loop(&self) -> EventLoop {
-        unsafe { ui_sys::uiMainSteps() };
+        unsafe { libui_sys::uiMainSteps() };
         return EventLoop {
             _pd: PhantomData,
             callback: None,
@@ -116,7 +116,7 @@ impl UI {
     ///
     /// Run in every window's default `on_closing` callback.
     pub fn quit(&self) {
-        unsafe { ui_sys::uiQuit() }
+        unsafe { libui_sys::uiQuit() }
     }
 
     /// Queues a function to be executed on the GUI threa when next possible. Returns
@@ -136,7 +136,7 @@ impl UI {
     pub fn queue_main<'ctx, F: FnMut() + 'ctx>(&'ctx self, callback: F) {
         unsafe {
             let mut data: Box<Box<FnMut()>> = Box::new(Box::new(callback));
-            ui_sys::uiQueueMain(
+            libui_sys::uiQueueMain(
                 None,
                 &mut *data as *mut Box<FnMut()> as *mut c_void,
             );
@@ -148,7 +148,7 @@ impl UI {
     pub fn on_should_quit<'ctx, F: FnMut() + 'ctx>(&'ctx self, callback: F) {
         unsafe {
             let mut data: Box<Box<FnMut()>> = Box::new(Box::new(callback));
-            ui_sys::uiOnShouldQuit(
+            libui_sys::uiOnShouldQuit(
                 None,
                 &mut *data as *mut Box<FnMut()> as *mut c_void,
             );
@@ -184,7 +184,7 @@ impl<'s> EventLoop<'s> {
     /// Returns `true` if the application should continue running, and `false`
     /// if it should quit.
     pub fn next_tick(&mut self, _ctx: &UI) -> bool {
-        let result = unsafe { ui_sys::uiMainStep(false as c_int) == 1 };
+        let result = unsafe { libui_sys::uiMainStep(false as c_int) == 1 };
         if let Some(ref mut c) = self.callback {
             c();
         }
@@ -197,7 +197,7 @@ impl<'s> EventLoop<'s> {
     /// Returns `true` if the application should continue running, and `false`
     /// if it should quit.
     pub fn next_event_tick(&mut self, _ctx: &UI) -> bool {
-        let result = unsafe { ui_sys::uiMainStep(true as c_int) == 1 };
+        let result = unsafe { libui_sys::uiMainStep(true as c_int) == 1 };
         if let Some(ref mut c) = self.callback {
             c();
         }

@@ -1,5 +1,5 @@
 use draw::{Brush, Path, StrokeParams, Transform};
-use ui_sys::{self, uiDrawContext};
+use libui_sys::{self, uiDrawContext};
 
 /// Drawing context, used to draw custom content on the screen.
 pub struct DrawContext {
@@ -23,7 +23,7 @@ impl DrawContext {
         unsafe {
             let brush = brush.as_ui_draw_brush_ref(self);
             let stroke_params = stroke_params.as_stroke_params_ref(self);
-            ui_sys::uiDrawStroke(
+            libui_sys::uiDrawStroke(
                 self.ui_draw_context,
                 path.ptr(),
                 brush.ptr(),
@@ -36,22 +36,22 @@ impl DrawContext {
     pub fn fill(&self, path: &Path, brush: &Brush) {
         unsafe {
             let brush = brush.as_ui_draw_brush_ref(self);
-            ui_sys::uiDrawFill(self.ui_draw_context, path.ptr(), brush.ptr())
+            libui_sys::uiDrawFill(self.ui_draw_context, path.ptr(), brush.ptr())
         }
     }
 
     /// Transform this DrawContext by the given Transform.
     pub fn transform(&self, txform: &Transform) {
-        unsafe { ui_sys::uiDrawTransform(self.ui_draw_context, txform.ptr()) }
+        unsafe { libui_sys::uiDrawTransform(self.ui_draw_context, txform.ptr()) }
     }
 
     /// Open a modal allowing the user to save the contents of this DrawContext.
     pub fn save(&self) {
-        unsafe { ui_sys::uiDrawSave(self.ui_draw_context) }
+        unsafe { libui_sys::uiDrawSave(self.ui_draw_context) }
     }
 
     /// Open a modal allowing the user to load the contents of a DrawContext onto this one.
     pub fn restore(&self) {
-        unsafe { ui_sys::uiDrawRestore(self.ui_draw_context) }
+        unsafe { libui_sys::uiDrawRestore(self.ui_draw_context) }
     }
 }

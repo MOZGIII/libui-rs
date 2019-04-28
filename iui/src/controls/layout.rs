@@ -4,7 +4,7 @@ use std::os::raw::c_int;
 use std::ffi::{CStr, CString};
 use std::mem;
 use ui::UI;
-use ui_sys::{self, uiBox, uiControl, uiGroup, uiSeparator, uiTab, uiGrid, uiAlign, uiAt};
+use libui_sys::{self, uiBox, uiControl, uiGroup, uiSeparator, uiTab, uiGrid, uiAlign, uiAt};
 
 /// Defines the ways in which the children of boxes can be layed out.
 pub enum LayoutStrategy {
@@ -30,7 +30,7 @@ impl VerticalBox {
     /// Create a new vertical box layout.
     pub fn new(_ctx: &UI) -> VerticalBox {
         VerticalBox {
-            uiBox: unsafe { ui_sys::uiNewVerticalBox() },
+            uiBox: unsafe { libui_sys::uiNewVerticalBox() },
         }
     }
 }
@@ -39,7 +39,7 @@ impl HorizontalBox {
     /// Create a new horizontal box layout.
     pub fn new(_ctx: &UI) -> HorizontalBox {
         HorizontalBox {
-            uiBox: unsafe { ui_sys::uiNewHorizontalBox() },
+            uiBox: unsafe { libui_sys::uiNewHorizontalBox() },
         }
     }
 }
@@ -52,16 +52,16 @@ fn append<T: Into<Control>>(b: *mut uiBox, ctx: &UI, child: T, strategy: LayoutS
     let control = child.into();
     unsafe {
         assert!(ctx.parent_of(control.clone()).is_none());
-        ui_sys::uiBoxAppend(b, control.ui_control, stretchy as c_int)
+        libui_sys::uiBoxAppend(b, control.ui_control, stretchy as c_int)
     }
 }
 
 fn padded(b: *mut uiBox, _ctx: &UI) -> bool {
-    unsafe { ui_sys::uiBoxPadded(b) != 0 }
+    unsafe { libui_sys::uiBoxPadded(b) != 0 }
 }
 
 fn set_padded(b: *mut uiBox, padded: bool, _ctx: &UI) {
-    unsafe { ui_sys::uiBoxSetPadded(b, padded as c_int) }
+    unsafe { libui_sys::uiBoxSetPadded(b, padded as c_int) }
 }
 
 impl VerticalBox {
@@ -115,7 +115,7 @@ impl Group {
     pub fn new(_ctx: &UI, title: &str) -> Group {
         let mut group = unsafe {
             let c_string = CString::new(title.as_bytes().to_vec()).unwrap();
-            Group::from_raw(ui_sys::uiNewGroup(c_string.as_ptr()))
+            Group::from_raw(libui_sys::uiNewGroup(c_string.as_ptr()))
         };
         group.set_margined(_ctx, true);
         group
@@ -124,7 +124,7 @@ impl Group {
     /// Get a copy of the current group title.
     pub fn title(&self, _ctx: &UI) -> String {
         unsafe {
-            CStr::from_ptr(ui_sys::uiGroupTitle(self.uiGroup))
+            CStr::from_ptr(libui_sys::uiGroupTitle(self.uiGroup))
                 .to_string_lossy()
                 .into_owned()
         }
@@ -132,37 +132,37 @@ impl Group {
 
     /// Get a reference to the existing group title.
     pub fn title_ref(&self, _ctx: &UI) -> &CStr {
-        unsafe { CStr::from_ptr(ui_sys::uiGroupTitle(self.uiGroup)) }
+        unsafe { CStr::from_ptr(libui_sys::uiGroupTitle(self.uiGroup)) }
     }
 
     // Set the group's title.
     pub fn set_title(&mut self, _ctx: &UI, title: &str) {
         unsafe {
             let c_string = CString::new(title.as_bytes().to_vec()).unwrap();
-            ui_sys::uiGroupSetTitle(self.uiGroup, c_string.as_ptr())
+            libui_sys::uiGroupSetTitle(self.uiGroup, c_string.as_ptr())
         }
     }
 
     // Set the group's child widget.
     pub fn set_child<T: Into<Control>>(&mut self, _ctx: &UI, child: T) {
-        unsafe { ui_sys::uiGroupSetChild(self.uiGroup, child.into().ui_control) }
+        unsafe { libui_sys::uiGroupSetChild(self.uiGroup, child.into().ui_control) }
     }
 
     // Check whether or not the group draws a margin.
     pub fn margined(&self, _ctx: &UI) -> bool {
-        unsafe { ui_sys::uiGroupMargined(self.uiGroup) != 0 }
+        unsafe { libui_sys::uiGroupMargined(self.uiGroup) != 0 }
     }
 
     // Set whether or not the group draws a margin.
     pub fn set_margined(&mut self, _ctx: &UI, margined: bool) {
-        unsafe { ui_sys::uiGroupSetMargined(self.uiGroup, margined as c_int) }
+        unsafe { libui_sys::uiGroupSetMargined(self.uiGroup, margined as c_int) }
     }
 }
 
 impl TabGroup {
     /// Create a new, empty group of tabs.
     pub fn new(_ctx: &UI) -> TabGroup {
-        unsafe { TabGroup::from_raw(ui_sys::uiNewTab()) }
+        unsafe { TabGroup::from_raw(libui_sys::uiNewTab()) }
     }
 
     /// Add the given control as a new tab in the tab group with the given name.
@@ -172,8 +172,8 @@ impl TabGroup {
         let control = control.into();
         unsafe {
             let c_string = CString::new(name.as_bytes().to_vec()).unwrap();
-            ui_sys::uiTabAppend(self.uiTab, c_string.as_ptr(), control.ui_control);
-            ui_sys::uiTabNumPages(self.uiTab) as i32
+            libui_sys::uiTabAppend(self.uiTab, c_string.as_ptr(), control.ui_control);
+            libui_sys::uiTabNumPages(self.uiTab) as i32
         }
     }
 
@@ -189,13 +189,13 @@ impl TabGroup {
     ) -> i32 {
         unsafe {
             let c_string = CString::new(name.as_bytes().to_vec()).unwrap();
-            ui_sys::uiTabInsertAt(
+            libui_sys::uiTabInsertAt(
                 self.uiTab,
                 c_string.as_ptr(),
                 before,
                 control.into().ui_control,
             );
-            ui_sys::uiTabNumPages(self.uiTab) as i32
+            libui_sys::uiTabNumPages(self.uiTab) as i32
         }
     }
 
@@ -207,9 +207,9 @@ impl TabGroup {
     /// to decrement its reference count per `libui`'s UI as of today, unless we maintain a
     /// separate list of children ourselves…
     pub fn delete(&mut self, _ctx: &UI, index: i32) -> Result<i32, UIError> {
-        let n = unsafe { ui_sys::uiTabNumPages(self.uiTab) as i32};
+        let n = unsafe { libui_sys::uiTabNumPages(self.uiTab) as i32};
         if index < n {
-            unsafe { ui_sys::uiTabDelete(self.uiTab, index) };
+            unsafe { libui_sys::uiTabDelete(self.uiTab, index) };
             Ok(n)
         } else {
             Err(UIError::TabGroupIndexOutOfBounds { index: index, n: n })
@@ -218,12 +218,12 @@ impl TabGroup {
 
     /// Determine whether or not the tab group provides margins around its children.
     pub fn margined(&self, _ctx: &UI, page: i32) -> bool {
-        unsafe { ui_sys::uiTabMargined(self.uiTab, page) != 0 }
+        unsafe { libui_sys::uiTabMargined(self.uiTab, page) != 0 }
     }
 
     /// Set whether or not the tab group provides margins around its children.
     pub fn set_margined(&mut self, _ctx: &UI, page: i32, margined: bool) {
-        unsafe { ui_sys::uiTabSetMargined(self.uiTab, page, margined as c_int) }
+        unsafe { libui_sys::uiTabSetMargined(self.uiTab, page, margined as c_int) }
     }
 }
 
@@ -235,7 +235,7 @@ define_control!{
 
 impl HorizontalSeparator {
     pub fn new(_ctx: &UI) -> Self {
-        unsafe { HorizontalSeparator::from_raw(ui_sys::uiNewHorizontalSeparator()) }
+        unsafe { HorizontalSeparator::from_raw(libui_sys::uiNewHorizontalSeparator()) }
     }
 }
 
@@ -247,7 +247,7 @@ define_control! {
 
 impl Spacer {
     pub fn new(_ctx: &UI) -> Self {
-        unsafe { Spacer::from_raw(ui_sys::uiNewHorizontalBox()) }
+        unsafe { Spacer::from_raw(libui_sys::uiNewHorizontalBox()) }
     }
 }
 
@@ -281,10 +281,10 @@ impl GridAlignment {
     fn into_ui_align(self) -> uiAlign {
         use self::GridAlignment::*;
         return match self {
-            Fill => ui_sys::uiAlignFill,
-            Start => ui_sys::uiAlignStart,
-            Center => ui_sys::uiAlignCenter,
-            End => ui_sys::uiAlignEnd 
+            Fill => libui_sys::uiAlignFill,
+            Start => libui_sys::uiAlignStart,
+            Center => libui_sys::uiAlignCenter,
+            End => libui_sys::uiAlignEnd 
         } as uiAlign;
     }
 }
@@ -306,10 +306,10 @@ impl GridInsertionStrategy {
     fn into_ui_at(self) -> uiAt {
         use self::GridInsertionStrategy::*;
         return match self {
-            Leading => ui_sys::uiAtLeading,
-            Top => ui_sys::uiAtTop,
-            Trailing => ui_sys::uiAtTrailing,
-            Bottom => ui_sys::uiAtBottom 
+            Leading => libui_sys::uiAtLeading,
+            Top => libui_sys::uiAtTop,
+            Trailing => libui_sys::uiAtTrailing,
+            Bottom => libui_sys::uiAtBottom 
         } as uiAlign;
     }
 }
@@ -324,12 +324,12 @@ define_control!{
 impl LayoutGrid {
     /// Creates a new `LayoutGrid`.
     pub fn new(_ctx: &UI) -> Self {
-        unsafe { LayoutGrid::from_raw(ui_sys::uiNewGrid()) }
+        unsafe { LayoutGrid::from_raw(libui_sys::uiNewGrid()) }
     }
     
     /// Returns `true` if the `LayoutGrid` is padded and `false` if not.
     pub fn padded(&self, _ctx: &UI) -> bool {
-        if unsafe { ui_sys::uiGridPadded(self.uiGrid) } == 0 {
+        if unsafe { libui_sys::uiGridPadded(self.uiGrid) } == 0 {
             true
         } else {
             false
@@ -341,7 +341,7 @@ impl LayoutGrid {
        let v = if padded { 1 } else { 0 };
 
        unsafe {
-           ui_sys::uiGridSetPadded(self.uiGrid, v);
+           libui_sys::uiGridSetPadded(self.uiGrid, v);
        }
     }
 
@@ -358,7 +358,7 @@ impl LayoutGrid {
             GridExpand::Both => (1, 1),
         };
         unsafe { 
-            ui_sys::uiGridAppend(
+            libui_sys::uiGridAppend(
                 self.uiGrid, control.into().ui_control, left, height, xspan, yspan,
                 hexpand, halign.into_ui_align(), vexpand, valign.into_ui_align()
             );
@@ -379,7 +379,7 @@ impl LayoutGrid {
             GridExpand::Both => (1, 1),
         };
         unsafe {
-            ui_sys::uiGridInsertAt(
+            libui_sys::uiGridInsertAt(
                 self.uiGrid, control.into().ui_control, existing.into().ui_control,
                 at.into_ui_at(), xspan, yspan,
                 hexpand, halign.into_ui_align(), vexpand, valign.into_ui_align()

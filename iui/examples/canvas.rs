@@ -1,5 +1,5 @@
 extern crate iui;
-extern crate ui_sys;
+extern crate libui_sys;
 
 use iui::controls::{
     Area, AreaDrawParams, AreaHandler, HorizontalBox, LayoutStrategy,
