@@ -43,3 +43,5 @@ libc = "0.2"
 failure = "0.1.1"
 libui-sys = "0.1"
 
+[features]
+static = ["libui-sys/static"]
