@@ -1,5 +1,6 @@
 use draw::DrawContext;
 use libui_sys::uiDrawStrokeParams;
+use std::convert::TryInto;
 use std::marker::PhantomData;
 use std::os::raw::c_double;
 
@@ -31,7 +32,7 @@ impl StrokeParams {
                 Thickness: self.thickness,
                 MiterLimit: self.miter_limit,
                 Dashes: self.dashes.as_ptr() as *mut c_double,
-                NumDashes: self.dashes.len(),
+                NumDashes: self.dashes.len().try_into().unwrap(),
                 DashPhase: self.dash_phase,
             },
             phantom: PhantomData,

@@ -1,5 +1,6 @@
 use draw::DrawContext;
 use libui_sys::{self, uiDrawBrush};
+use std::convert::TryInto;
 use std::marker::PhantomData;
 use std::ptr;
 
@@ -58,7 +59,7 @@ impl Brush {
                     Y1: linear_gradient_brush.end_y,
                     OuterRadius: 0.0,
                     Stops: linear_gradient_brush.stops.as_ptr() as *mut BrushGradientStop,
-                    NumStops: linear_gradient_brush.stops.len(),
+                    NumStops: linear_gradient_brush.stops.len().try_into().unwrap(),
                 },
                 phantom: PhantomData,
             },
@@ -77,7 +78,7 @@ impl Brush {
                     Y1: radial_gradient_brush.outer_circle_center_y,
                     OuterRadius: radial_gradient_brush.outer_radius,
                     Stops: radial_gradient_brush.stops.as_ptr() as *mut BrushGradientStop,
-                    NumStops: radial_gradient_brush.stops.len(),
+                    NumStops: radial_gradient_brush.stops.len().try_into().unwrap(),
                 },
                 phantom: PhantomData,
             },

@@ -3,6 +3,7 @@ use ffi_tools;
 use libui_sys;
 use std::os::raw::{c_int, c_void};
 
+use std::convert::TryInto;
 use std::ffi::CStr;
 use std::marker::PhantomData;
 use std::mem;
@@ -73,7 +74,9 @@ impl UI {
         unsafe {
             // Create the magic value needed to init libUI
             let mut init_options = libui_sys::uiInitOptions {
-                Size: mem::size_of::<libui_sys::uiInitOptions>(),
+                Size: mem::size_of::<libui_sys::uiInitOptions>()
+                    .try_into()
+                    .unwrap(),
             };
 
             // Actually start up the library's functionality
