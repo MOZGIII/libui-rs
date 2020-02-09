@@ -1,7 +1,7 @@
-use std::marker::PhantomData;
-use std::ptr;
 use draw::DrawContext;
 use libui_sys::{self, uiDrawBrush};
+use std::marker::PhantomData;
+use std::ptr;
 
 pub use libui_sys::uiDrawBrushGradientStop as BrushGradientStop;
 

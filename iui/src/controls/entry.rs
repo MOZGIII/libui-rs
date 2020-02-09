@@ -1,15 +1,15 @@
 //! User input mechanisms: numbers, colors, and text in various forms.
 
 use super::Control;
+use libui_sys::{
+    self, uiCheckbox, uiCombobox, uiControl, uiEntry, uiMultilineEntry, uiRadioButtons, uiSlider,
+    uiSpinbox,
+};
 use std::ffi::{CStr, CString};
 use std::i32;
 use std::mem;
 use std::os::raw::c_void;
 use ui::UI;
-use libui_sys::{
-    self, uiCheckbox, uiCombobox, uiControl, uiEntry, uiMultilineEntry, uiRadioButtons, uiSlider,
-    uiSpinbox,
-};
 
 pub trait NumericEntry {
     fn value(&self, ctx: &UI) -> i32;
@@ -311,7 +311,9 @@ impl RadioButtons {
 
     pub fn append(&self, _ctx: &UI, name: &str) {
         let c_string = CString::new(name.as_bytes().to_vec()).unwrap();
-        unsafe { libui_sys::uiRadioButtonsAppend(self.uiRadioButtons, c_string.as_ptr()); }
+        unsafe {
+            libui_sys::uiRadioButtonsAppend(self.uiRadioButtons, c_string.as_ptr());
+        }
     }
 
     pub fn selected(&self, _ctx: &UI) -> i32 {
@@ -319,7 +321,9 @@ impl RadioButtons {
     }
 
     pub fn set_selected(&mut self, _ctx: &UI, idx: i32) {
-        unsafe { libui_sys::uiRadioButtonsSetSelected(self.uiRadioButtons, idx); }
+        unsafe {
+            libui_sys::uiRadioButtonsSetSelected(self.uiRadioButtons, idx);
+        }
     }
 
     pub fn on_selected<'ctx, F: FnMut(i32) + 'ctx>(&self, _ctx: &'ctx UI, callback: F) {

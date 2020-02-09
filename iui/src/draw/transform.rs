@@ -1,6 +1,6 @@
+use libui_sys::{self, uiDrawMatrix};
 use std::mem;
 use std::ops::Mul;
-use libui_sys::{self, uiDrawMatrix};
 
 /// A transformation which can be applied to the contents of a DrawContext.
 #[derive(Copy, Clone, Debug)]

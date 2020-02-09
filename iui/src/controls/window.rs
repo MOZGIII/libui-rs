@@ -1,13 +1,13 @@
 //! Functionality related to creating, managing, and destroying GUI windows.
 
 use controls::Control;
-use std::os::raw::{c_int, c_void};
+use libui_sys::{self, uiControl, uiWindow};
 use std::cell::RefCell;
 use std::ffi::{CStr, CString};
 use std::mem;
+use std::os::raw::{c_int, c_void};
 use std::path::PathBuf;
 use ui::UI;
-use libui_sys::{self, uiControl, uiWindow};
 
 thread_local! {
     static WINDOWS: RefCell<Vec<Window>> = RefCell::new(Vec::new())
@@ -20,7 +20,7 @@ pub enum WindowType {
     NoMenubar,
 }
 
-define_control!{
+define_control! {
     /// Contains a single child control and displays it and its children in a window on the screen.
     rust_type: Window,
     sys_type: uiWindow
@@ -87,7 +87,11 @@ impl Window {
     ///
     /// This is often used on the main window of an application to quit
     /// the application when the window is closed.
-    pub fn on_closing<'ctx, F: FnMut(&mut Window) + 'ctx>(&mut self, _ctx: &'ctx UI, mut callback: F) {
+    pub fn on_closing<'ctx, F: FnMut(&mut Window) + 'ctx>(
+        &mut self,
+        _ctx: &'ctx UI,
+        mut callback: F,
+    ) {
         unsafe {
             let mut data: Box<Box<FnMut(&mut Window) -> bool>> = Box::new(Box::new(|window| {
                 callback(window);

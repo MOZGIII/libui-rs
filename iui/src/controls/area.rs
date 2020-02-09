@@ -2,13 +2,13 @@
 
 use controls::Control;
 use draw;
-use std::mem;
-use std::os::raw::c_int;
-use ui::UI;
 pub use libui_sys::uiExtKey as ExtKey;
 use libui_sys::{
     self, uiArea, uiAreaDrawParams, uiAreaHandler, uiAreaKeyEvent, uiAreaMouseEvent, uiControl,
 };
+use std::mem;
+use std::os::raw::c_int;
+use ui::UI;
 
 pub trait AreaHandler {
     fn draw(&mut self, _area: &Area, _area_draw_params: &AreaDrawParams) {}

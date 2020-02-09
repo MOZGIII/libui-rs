@@ -1,10 +1,10 @@
 use super::Control;
 use error::UIError;
-use std::os::raw::c_int;
+use libui_sys::{self, uiAlign, uiAt, uiBox, uiControl, uiGrid, uiGroup, uiSeparator, uiTab};
 use std::ffi::{CStr, CString};
 use std::mem;
+use std::os::raw::c_int;
 use ui::UI;
-use libui_sys::{self, uiBox, uiControl, uiGroup, uiSeparator, uiTab, uiGrid, uiAlign, uiAt};
 
 /// Defines the ways in which the children of boxes can be layed out.
 pub enum LayoutStrategy {
@@ -207,7 +207,7 @@ impl TabGroup {
     /// to decrement its reference count per `libui`'s UI as of today, unless we maintain a
     /// separate list of children ourselves…
     pub fn delete(&mut self, _ctx: &UI, index: i32) -> Result<i32, UIError> {
-        let n = unsafe { libui_sys::uiTabNumPages(self.uiTab) as i32};
+        let n = unsafe { libui_sys::uiTabNumPages(self.uiTab) as i32 };
         if index < n {
             unsafe { libui_sys::uiTabDelete(self.uiTab, index) };
             Ok(n)
@@ -227,7 +227,7 @@ impl TabGroup {
     }
 }
 
-define_control!{
+define_control! {
     /// Horizontal line, to seperate things visually.
     rust_type: HorizontalSeparator,
     sys_type: uiSeparator
@@ -261,7 +261,7 @@ pub enum GridExpand {
     /// This control should use extra space vertically
     Vertical,
     /// This control should use all available space in both dimensions
-    Both
+    Both,
 }
 
 /// Informs a `LayoutGrid` how to align a control.
@@ -274,7 +274,7 @@ pub enum GridAlignment {
     /// Collapse equally on both sides of the available space.
     Center,
     /// Collapse toward the end of the available space.
-    End
+    End,
 }
 
 impl GridAlignment {
@@ -284,7 +284,7 @@ impl GridAlignment {
             Fill => libui_sys::uiAlignFill,
             Start => libui_sys::uiAlignStart,
             Center => libui_sys::uiAlignCenter,
-            End => libui_sys::uiAlignEnd 
+            End => libui_sys::uiAlignEnd,
         } as uiAlign;
     }
 }
@@ -299,7 +299,7 @@ pub enum GridInsertionStrategy {
     /// Place control to right of existing control, align tops
     Trailing,
     /// Place control below existing control, align left edges
-    Bottom
+    Bottom,
 }
 
 impl GridInsertionStrategy {
@@ -309,24 +309,23 @@ impl GridInsertionStrategy {
             Leading => libui_sys::uiAtLeading,
             Top => libui_sys::uiAtTop,
             Trailing => libui_sys::uiAtTrailing,
-            Bottom => libui_sys::uiAtBottom 
+            Bottom => libui_sys::uiAtBottom,
         } as uiAlign;
     }
 }
 
-define_control!{
+define_control! {
     /// Lays out its children in a grid according to insertion instructions.
     rust_type: LayoutGrid,
     sys_type: uiGrid
 }
-
 
 impl LayoutGrid {
     /// Creates a new `LayoutGrid`.
     pub fn new(_ctx: &UI) -> Self {
         unsafe { LayoutGrid::from_raw(libui_sys::uiNewGrid()) }
     }
-    
+
     /// Returns `true` if the `LayoutGrid` is padded and `false` if not.
     pub fn padded(&self, _ctx: &UI) -> bool {
         if unsafe { libui_sys::uiGridPadded(self.uiGrid) } == 0 {
@@ -338,40 +337,61 @@ impl LayoutGrid {
 
     /// Sets the padding state of the `LayoutGrid`
     pub fn set_padded(&mut self, _ctx: &UI, padded: bool) {
-       let v = if padded { 1 } else { 0 };
+        let v = if padded { 1 } else { 0 };
 
-       unsafe {
-           libui_sys::uiGridSetPadded(self.uiGrid, v);
-       }
+        unsafe {
+            libui_sys::uiGridSetPadded(self.uiGrid, v);
+        }
     }
 
     /// Adds a control to the `LayoutGrid`.
-    pub fn append<T: Into<Control>>(&mut self, _ctx: &UI, control: T,
-                                    left: i32, height: i32,
-                                    xspan: i32, yspan: i32,
-                                    expand: GridExpand,
-                                    halign: GridAlignment, valign: GridAlignment) {
+    pub fn append<T: Into<Control>>(
+        &mut self,
+        _ctx: &UI,
+        control: T,
+        left: i32,
+        height: i32,
+        xspan: i32,
+        yspan: i32,
+        expand: GridExpand,
+        halign: GridAlignment,
+        valign: GridAlignment,
+    ) {
         let (hexpand, vexpand) = match expand {
             GridExpand::Neither => (0, 0),
             GridExpand::Horizontal => (1, 0),
             GridExpand::Vertical => (0, 1),
             GridExpand::Both => (1, 1),
         };
-        unsafe { 
+        unsafe {
             libui_sys::uiGridAppend(
-                self.uiGrid, control.into().ui_control, left, height, xspan, yspan,
-                hexpand, halign.into_ui_align(), vexpand, valign.into_ui_align()
+                self.uiGrid,
+                control.into().ui_control,
+                left,
+                height,
+                xspan,
+                yspan,
+                hexpand,
+                halign.into_ui_align(),
+                vexpand,
+                valign.into_ui_align(),
             );
-        }    
+        }
     }
 
     /// Inserts a control in to the `LayoutGrid` relative to an existing control.
-    pub fn insert_at<T: Into<Control>, U: Into<Control>>(&mut self, _ctx: &UI, 
-                                    control: T, existing:U, at: GridInsertionStrategy,
-                                    xspan: i32, yspan: i32,
-                                    expand: GridExpand,
-                                    halign: GridAlignment, valign: GridAlignment){
-        
+    pub fn insert_at<T: Into<Control>, U: Into<Control>>(
+        &mut self,
+        _ctx: &UI,
+        control: T,
+        existing: U,
+        at: GridInsertionStrategy,
+        xspan: i32,
+        yspan: i32,
+        expand: GridExpand,
+        halign: GridAlignment,
+        valign: GridAlignment,
+    ) {
         let (hexpand, vexpand) = match expand {
             GridExpand::Neither => (0, 0),
             GridExpand::Horizontal => (1, 0),
@@ -380,10 +400,17 @@ impl LayoutGrid {
         };
         unsafe {
             libui_sys::uiGridInsertAt(
-                self.uiGrid, control.into().ui_control, existing.into().ui_control,
-                at.into_ui_at(), xspan, yspan,
-                hexpand, halign.into_ui_align(), vexpand, valign.into_ui_align()
+                self.uiGrid,
+                control.into().ui_control,
+                existing.into().ui_control,
+                at.into_ui_at(),
+                xspan,
+                yspan,
+                hexpand,
+                halign.into_ui_align(),
+                vexpand,
+                valign.into_ui_align(),
             );
         }
-    } 
+    }
 }

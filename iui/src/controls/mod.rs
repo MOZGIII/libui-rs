@@ -2,8 +2,8 @@
 //!
 //! Note that `Control` and all specific control types are references to memory which is owned by the UI library.
 
-use ui::UI;
 use libui_sys::{self, uiControl};
+use ui::UI;
 
 use std::ptr;
 

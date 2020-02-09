@@ -1,10 +1,10 @@
 //! Menus that appear at the top of windows, and the items that go in them.
 
 use controls::Window;
-use std::os::raw::{c_int, c_void};
+use libui_sys::{self, uiMenu, uiMenuItem, uiWindow};
 use std::ffi::CString;
 use std::mem;
-use libui_sys::{self, uiMenu, uiMenuItem, uiWindow};
+use std::os::raw::{c_int, c_void};
 use UI;
 
 /// A `MenuItem` represents an item that is shown in a `Menu`. Note that, unlike many controls,
@@ -46,7 +46,11 @@ impl MenuItem {
     }
 
     /// Sets the function to be executed when the item is clicked/selected.
-    pub fn on_clicked<'ctx, F: FnMut(&MenuItem, &Window) + 'ctx>(&self, _ctx: &'ctx UI, callback: F) {
+    pub fn on_clicked<'ctx, F: FnMut(&MenuItem, &Window) + 'ctx>(
+        &self,
+        _ctx: &'ctx UI,
+        callback: F,
+    ) {
         unsafe {
             let mut data: Box<Box<FnMut(&MenuItem, &Window)>> = Box::new(Box::new(callback));
             libui_sys::uiMenuItemOnClicked(

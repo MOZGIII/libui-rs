@@ -1,7 +1,7 @@
-use std::marker::PhantomData;
-use std::os::raw::c_double;
 use draw::DrawContext;
 use libui_sys::uiDrawStrokeParams;
+use std::marker::PhantomData;
+use std::os::raw::c_double;
 
 pub use libui_sys::uiDrawLineCap as LineCap;
 pub use libui_sys::uiDrawLineJoin as LineJoin;

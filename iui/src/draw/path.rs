@@ -1,6 +1,6 @@
 use draw::DrawContext;
-use std::os::raw::c_int;
 use libui_sys::{self, uiDrawFillMode, uiDrawFillModeAlternate, uiDrawFillModeWinding, uiDrawPath};
+use std::os::raw::c_int;
 
 pub struct Path {
     ui_draw_path: *mut uiDrawPath,
@@ -103,7 +103,9 @@ impl Path {
         end_x: f64,
         end_y: f64,
     ) {
-        unsafe { libui_sys::uiDrawPathBezierTo(self.ui_draw_path, c1x, c1y, c2x, c2y, end_x, end_y) }
+        unsafe {
+            libui_sys::uiDrawPathBezierTo(self.ui_draw_path, c1x, c1y, c2x, c2y, end_x, end_y)
+        }
     }
 
     pub fn close_figure(&self, _ctx: &DrawContext) {

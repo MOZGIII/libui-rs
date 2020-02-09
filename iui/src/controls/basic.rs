@@ -1,17 +1,17 @@
 use super::Control;
-use std::os::raw::c_void;
+use libui_sys::{self, uiButton, uiControl, uiLabel};
 use std::ffi::{CStr, CString};
 use std::mem;
+use std::os::raw::c_void;
 use ui::UI;
-use libui_sys::{self, uiButton, uiControl, uiLabel};
 
-define_control!{
+define_control! {
     /// A non-interactable piece of text.
     rust_type: Label,
     sys_type: uiLabel
 }
 
-define_control!{
+define_control! {
     /// A textual button which users can click on, causing a callback to run.
     rust_type: Button,
     sys_type: uiButton

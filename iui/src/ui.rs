@@ -1,7 +1,7 @@
 use error::UIError;
 use ffi_tools;
+use libui_sys;
 use std::os::raw::{c_int, c_void};
-use libui_sys as libui_sys;
 
 use std::ffi::CStr;
 use std::marker::PhantomData;
@@ -136,10 +136,7 @@ impl UI {
     pub fn queue_main<'ctx, F: FnMut() + 'ctx>(&'ctx self, callback: F) {
         unsafe {
             let mut data: Box<Box<FnMut()>> = Box::new(Box::new(callback));
-            libui_sys::uiQueueMain(
-                None,
-                &mut *data as *mut Box<FnMut()> as *mut c_void,
-            );
+            libui_sys::uiQueueMain(None, &mut *data as *mut Box<FnMut()> as *mut c_void);
             mem::forget(data);
         }
     }
@@ -148,10 +145,7 @@ impl UI {
     pub fn on_should_quit<'ctx, F: FnMut() + 'ctx>(&'ctx self, callback: F) {
         unsafe {
             let mut data: Box<Box<FnMut()>> = Box::new(Box::new(callback));
-            libui_sys::uiOnShouldQuit(
-                None,
-                &mut *data as *mut Box<FnMut()> as *mut c_void,
-            );
+            libui_sys::uiOnShouldQuit(None, &mut *data as *mut Box<FnMut()> as *mut c_void);
             mem::forget(data);
         }
     }
