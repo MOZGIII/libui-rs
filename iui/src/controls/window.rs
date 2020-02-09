@@ -93,14 +93,14 @@ impl Window {
         mut callback: F,
     ) {
         unsafe {
-            let mut data: Box<Box<FnMut(&mut Window) -> bool>> = Box::new(Box::new(|window| {
+            let mut data: Box<Box<dyn FnMut(&mut Window) -> bool>> = Box::new(Box::new(|window| {
                 callback(window);
                 false
             }));
             libui_sys::uiWindowOnClosing(
                 self.uiWindow,
                 Some(c_callback),
-                &mut *data as *mut Box<FnMut(&mut Window) -> bool> as *mut c_void,
+                &mut *data as *mut Box<dyn FnMut(&mut Window) -> bool> as *mut c_void,
             );
             mem::forget(data);
         }
@@ -108,7 +108,7 @@ impl Window {
         extern "C" fn c_callback(window: *mut uiWindow, data: *mut c_void) -> i32 {
             unsafe {
                 let mut window = Window { uiWindow: window };
-                mem::transmute::<*mut c_void, Box<Box<FnMut(&mut Window) -> bool>>>(data)(
+                mem::transmute::<*mut c_void, Box<Box<dyn FnMut(&mut Window) -> bool>>>(data)(
                     &mut window,
                 ) as i32
             }
