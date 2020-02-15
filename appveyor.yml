@@ -48,9 +48,7 @@ install:
   - meson --version
 
 build_script:
-  - cd iui
   - cargo build --verbose
 
 test_script:
-  - cd iui
   - cargo build --verbose --tests --examples
