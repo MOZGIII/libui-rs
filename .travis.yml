@@ -32,4 +32,5 @@ env:
 script:
   - cd iui
   - cargo build --verbose --tests --examples
-  - xvfb-run cargo test
+  - xvfb-run cargo test --verbose
+  - xvfb-run cargo test --verbose --features static
